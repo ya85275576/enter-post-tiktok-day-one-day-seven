@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pocket Aquarium — Day One, Day Seven</title>
+<style>body{margin:0;background:#062a3f;color:#fff;font-family:system-ui;text-align:center}canvas{background:#1b7fa8;max-width:96vw;border:4px solid #08374f;border-radius:12px}button{font-size:18px;padding:8px 18px;margin:6px;border-radius:8px;border:0;cursor:pointer}</style></head>
+<body><h1>🐠 Pocket Aquarium</h1>
+<p>Tap the water to drop food. Watch your tank grow from day one to day seven!</p>
+<canvas id="c" width="720" height="800"></canvas><br>
+<button onclick="mode=1">Day One</button><button onclick="mode=7">Day Seven</button>
+<p id="s">Score: 0</p>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d');let mode=1,score=0,food=[];
+const fish1=[{x:200,y:300,c:'#ffb340',s:34,v:1.2}];
+const fish7=[];const cols=['#ffb340','#ff6b6b','#ffd93d','#6bcbff','#c792ff','#7dff9a','#ff9ad5'];
+for(let i=0;i<12;i++)fish7.push({x:60+((i*173)%600),y:120+((i*97)%480),c:cols[i%7],s:22+(i%4)*7,v:0.8+(i%5)*0.35,d:i%2?1:-1});
+c.onclick=e=>{const r=c.getBoundingClientRect();food.push({x:(e.clientX-r.left)*720/r.width,y:20});};
+function fish(f,t){x.save();x.translate(f.x,f.y+Math.sin(t/300+f.x)*6);x.scale(f.d||1,1);x.fillStyle=f.c;x.beginPath();x.ellipse(0,0,f.s,f.s*0.62,0,0,7);x.fill();x.beginPath();x.moveTo(-f.s,0);x.lineTo(-f.s*1.5,-f.s*0.5);x.lineTo(-f.s*1.5,f.s*0.5);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(f.s*0.45,-f.s*0.15,5,0,7);x.fill();x.fillStyle='#000';x.beginPath();x.arc(f.s*0.5,-f.s*0.15,2.5,0,7);x.fill();x.restore();}
+function plant(px,h,col){x.strokeStyle=col;x.lineWidth=7;for(let k=-1;k<2;k++){x.beginPath();x.moveTo(px,720);x.quadraticCurveTo(px+k*22,720-h/2,px+k*34,720-h);x.stroke();}}
+function draw(t){x.fillStyle='#1b7fa8';x.fillRect(0,0,720,800);x.fillStyle='#2fa3c7';x.fillRect(0,0,720,60);
+x.fillStyle='#e8d189';x.fillRect(0,720,720,80);
+if(mode===1){plant(620,90,'#3a9a4e');fish(fish1[0],t);fish1[0].x+=Math.sin(t/2000)*0.6;}
+else{for(let i=0;i<7;i++)plant(50+i*100,90+(i%3)*45,i%2?'#2ecc71':'#16a085');
+x.fillStyle='#b08968';x.fillRect(300,620,120,100);x.fillStyle='#8d6e63';x.fillRect(285,600,150,26);x.fillStyle='#ffd93d';x.fillRect(345,665,30,55);
+x.fillStyle='#ff7f50';for(let i=0;i<5;i++){x.beginPath();x.arc(90+i*140,700,16+(i%3)*5,0,7);x.fill();}
+x.fillStyle='#ffe066';x.beginPath();x.arc(640,660,14,0,7);x.fill();
+fish7.forEach(f=>{f.x+=f.v*f.d;if(f.x>680||f.x<40)f.d*=-1;fish(f,t);});
+x.fillStyle='rgba(255,255,255,.65)';for(let i=0;i<24;i++){x.beginPath();x.arc((i*83+t/9)%720,760-((t/6+i*47)%680),4+(i%3)*2,0,7);x.fill();}}
+food=food.filter(p=>p.y<730);food.forEach(p=>{p.y+=2.4;x.fillStyle='#a0522d';x.beginPath();x.arc(p.x,p.y,6,0,7);x.fill();if(mode===7&&(score+=0),p.y>690&&(score++,p.y=9999));});
+document.getElementById('s').textContent='Score: '+score+' · '+(mode===1?'Day One: one fish, bare sand, one plant':'Day Seven: 12 fish, coral, castle, treasure & bubbles!');
+requestAnimationFrame(draw);}requestAnimationFrame(draw);
+</script></body></html>
